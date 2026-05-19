@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Carrello Amazon</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 10px;
+            background-color: #f5f5f5;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #232f3e;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        h2 {
+            font-size: 20px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px; /* Importante per evitare lo zoom su iPhone */
+            -webkit-appearance: none; /* Rimuove lo stile predefinito su iOS */
+            appearance: none;
+            background-color: #fff;
+        }
+        
+        /* Aggiunta freccia personalizzata per i select */
+        select {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24'%3e%3cpath fill='none' d='M0 0h24v24H0z'/%3e%3cpath d='M12 15l-4.243-4.243 1.415-1.414L12 12.172l2.828-2.829 1.415 1.414z' fill='%23232f3e'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 20px;
+            padding-right: 30px;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #ff9900;
+            box-shadow: 0 0 0 2px rgba(255, 153, 0, 0.2);
+        }
+        
+        input[type="number"] {
+            -moz-appearance: textfield; /* Firefox */
+        }
+        
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        button {
+            width: 100%;
+            background-color: #ff9900;
+            color: white;
+            border: none;
+            padding: 14px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-bottom: 10px;
+            -webkit-appearance: none; /* Rimuove lo stile predefinito su iOS */
+            appearance: none;
+        }
+        
+        button:hover, button:active {
+            background-color: #e88e00;
+        }
+        
+        #reset-btn {
+            background-color: #dc3545;
+        }
+        
+        #reset-btn:hover, #reset-btn:active {
+            background-color: #c82333;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 15px;
+        }
+        
+        th, td {
+            padding: 10px 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        .cart-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .cart-item-details {
+            margin-bottom: 10px;
+        }
+        
+        .cart-item button {
+            background-color: #dc3545;
+            padding: 8px 10px;
+            margin-bottom: 0;
+            font-size: 14px;
+        }
+        
+        .total {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid #ddd;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        #receipt {
+            margin-top: 25px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        
+        #receipt h2 {
+            margin-top: 0;
+            color: #232f3e;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        
+        .hide {
+            display: none;
+        }
+        
+        /* Layout flessibile per cliente e data */
+        .cliente-data-container {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .cliente-data-container > div {
+            flex: 1;
+        }
+        
+        /* Responsive layout*/
+        @media (min-width: 500px) {
+            .form-row {
+                display: flex;
+                gap: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .form-row > div {
+                flex: 1;
+            }
+            
+            .button-group {
+                display: flex;
+                gap: 10px;
+            }
+            
+            .button-group button {
+                margin-bottom: 0;
+            }
+        }
+        
+        /* Versione per stampa */
+        @media print {
+            body {
+                background-color: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: 100%;
+            }
+            
+            button, #carrello, .form-group, .form-row {
+                display: none !important;
+            }
+            
+            #receipt {
+                display: block !important;
+                border: none;
+                padding: 0;
+                margin: 0;
+            }
+            
+        }
+
+        #zip-btn {
+            background-color: #2e7d32;
+        }
+        #zip-btn:hover, #zip-btn:active {
+            background-color: #1b5e20;
+        }
+    </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Carrello Acquisti</h1>
+        
+        <div class="cliente-data-container">
+            <div class="form-group">
+                <label for="cliente">Nome Cliente:</label>
+                <input type="text" id="cliente" placeholder="Inserisci il nome del cliente" autocomplete="name">
+            </div>
+            
+            <div class="form-group">
+                <label for="data-attuale">Data:</label>
+                <input type="text" id="data-attuale" readonly>
+            </div>
+        </div>
+        
+        <div>
+            <div class="form-group">
+                <label for="categoria">Categoria:</label>
+                                <select id="categoria">
+                    <option value="">Seleziona una categoria</option>
+                    <option value="PRODOTTI">PRODOTTI</option>
+                    <option value="OFFERTE PERMANENTI">OFFERTE PERMANENTI</option>
+                    <option value="OFFERTE STAGIONALI DAL 16/03/2026 AL 26/07/2026">OFFERTE STAGIONALI DAL 16/03/2026 AL 26/07/2026</option>
+                    <option value="OFFERTE STAGIONALI DAL 11/05/2026 AL 26/07/2026">OFFERTE STAGIONALI DAL 11/05/2026 AL 26/07/2026</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="gruppo-linea" style="display:none">
+                <label for="linea">Linea / Offerta:</label>
+                <select id="linea" disabled>
+                    <option value="">Seleziona prima una categoria</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="prodotto">Prodotto:</label>
+                <select id="prodotto" disabled>
+                    <option value="">Seleziona prima una linea</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="prezzo">Prezzo (€):</label>
+                <input type="text" id="prezzo" readonly>
+            </div>
+            
+            <div class="form-group">
+                <label for="quantita">Quantità:</label>
+                <input type="number" id="quantita" min="1" value="1" pattern="[0-9]*" inputmode="numeric">
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button id="aggiungi-btn">Aggiungi al Carrello</button>
+            <button id="reset-btn">Svuota Carrello</button>
+        </div>
+        
+        <div id="carrello">
+            <h2>Prodotti nel Carrello</h2>
+            <div id="items-container"></div>
+            <div class="total">
+                <span>Totale:</span>
+                <span id="totale">€0.00</span>
+            </div>
+        </div>
+        
+        <div id="receipt" class="hide">
+            <h2>Ordine</h2>
+            <p><strong>Cliente:</strong> <span id="receipt-cliente"></span></p>
+            <p><strong>Data:</strong> <span id="receipt-data"></span></p>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Prodotto</th>
+                            <th>Prezzo</th>
+                            <th>Qtà</th>
+                            <th>Totale</th>
+                        </tr>
+                    </thead>
+                    <tbody id="receipt-items">
+                    </tbody>
+                </table>
+            </div>
+            <div class="total">
+                <span>Totale:</span>
+                <span id="receipt-totale">€0.00</span>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button id="zip-btn">⬇ Scarica Ordine</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dati dal file PDF Listino Gialean
+                        const catalogo = {
+            "PRODOTTI": {
+                "LINEA VISO: PELLI NORMALI": [
+                    {nome: "Latte detergente", prezzo: 8.20},
+                    {nome: "Tonico", prezzo: 8.00},
+                    {nome: "Crema giorno incolore", prezzo: 9.90},
+                    {nome: "Crema notte", prezzo: 10.20},
+                    {nome: "Maschera crema", prezzo: 9.90}
+                ],
+                "LINEA VISO: PELLI DELICATE,COUPEROSE": [
+                    {nome: "Latte detergente", prezzo: 8.20},
+                    {nome: "Tonico", prezzo: 8.00},
+                    {nome: "Crema giorno incolore", prezzo: 10.20},
+                    {nome: "Crema notte", prezzo: 10.20},
+                    {nome: "Maschera crema", prezzo: 10.10}
+                ],
+                "LINEA VISO: PELLI SECCHE, DISIDRATATE": [
+                    {nome: "Latte detergente", prezzo: 8.20},
+                    {nome: "Tonico", prezzo: 8.00},
+                    {nome: "Crema giorno incolore", prezzo: 10.10},
+                    {nome: "Crema Notte", prezzo: 10.20},
+                    {nome: "Maschera crema", prezzo: 10.10}
+                ],
+                "LINEA VISO: PELLI GRASSE, IMPURE ACNEICHE": [
+                    {nome: "Latte detergente", prezzo: 8.20},
+                    {nome: "Tonico", prezzo: 8.00},
+                    {nome: "Crema giorno incolore", prezzo: 10.20},
+                    {nome: "Crema notte", prezzo: 10.20},
+                    {nome: "Maschera crema", prezzo: 10.10}
+                ],
+                "LINEA VISO: CONTORNO OCCHI": [
+                    {nome: "Crema nutriente protettiva contorno occhi", prezzo: 10.70},
+                    {nome: "Siero per Borse e Occhiaie", prezzo: 10.90},
+                    {nome: "Soavis ricetta per impacchi perioculari", prezzo: 7.60},
+                    {nome: "Lozione struccante", prezzo: 7.60},
+                    {nome: "Mascara Naturale Nero Rinforzante - Volumizzante", prezzo: 12.50},
+                    {nome: "Mascara Naturale Nero Rinforzante - Infoltente", prezzo: 12.50}
+                ],
+                "LINEA VISO: PERSONAL": [
+                    {nome: "Collagenina d'urto", prezzo: 17.40},
+                    {nome: "Delicute Concentrato antiageing", prezzo: 17.90},
+                    {nome: "Gel rassodante viso effetto lifting", prezzo: 18.70},
+                    {nome: "Protezione solare per il viso SPF 30", prezzo: 13.80},
+                    {nome: "Dermolife", prezzo: 16.10},
+                    {nome: "Maschera antiageing", prezzo: 15.20},
+                    {nome: "Maschera antiageing pelli mature", prezzo: 16.20},
+                    {nome: "Crema superidratante", prezzo: 11.70},
+                    {nome: "Crema supernutriente", prezzo: 11.70},
+                    {nome: "Ruinacne Dely 60", prezzo: 11.40},
+                    {nome: "Ruinacne Normal", prezzo: 11.40},
+                    {nome: "Speciale Crema Protettiva per pelli sensibili", prezzo: 11.50},
+                    {nome: "Caress cream", prezzo: 11.10},
+                    {nome: "Crema levigante per il viso", prezzo: 9.30},
+                    {nome: "Siero schiarente e illuminante", prezzo: 14.00},
+                    {nome: "Crema schiarente pelli secche e delicate", prezzo: 9.90},
+                    {nome: "Crema giorno colorata Sun Tan in tubetto", prezzo: 10.90},
+                    {nome: "Fluido Viso Correttore Naturale Chiaro", prezzo: 18.50},
+                    {nome: "Fluido Viso Correttore Naturale Medio", prezzo: 18.50},
+                    {nome: "Fluido Viso Correttore Naturale Scuro", prezzo: 18.50}
+                ],
+                "LINEA MASCHILE": [
+                    {nome: "Lozione prebarba", prezzo: 8.30},
+                    {nome: "Ognidì crema per barba protettiva", prezzo: 8.80},
+                    {nome: "Lozione dopo barba", prezzo: 8.70},
+                    {nome: "After shave emulsion", prezzo: 9.10},
+                    {nome: "Shampoo per barba", prezzo: 7.60},
+                    {nome: "Fluido per barba", prezzo: 10.60},
+                    {nome: "Crema viso idratante protettiva uomo", prezzo: 10.70},
+                    {nome: "Bagno schiuma tonificante uomo", prezzo: 6.70},
+                    {nome: "Bagno schiuma tonificante uomo PET", prezzo: 7.80},
+                    {nome: "Emulsione dopo bagno per uomo", prezzo: 10.80},
+                    {nome: "Frizione dopo bagno per uomo", prezzo: 9.90}
+                ],
+                "LINEA IGIENE ORALE": [
+                    {nome: "Edelweiss Collutorio per l'igiene orale", prezzo: 9.10},
+                    {nome: "Edelweiss Dentifricio Preparato per l'igiene orale", prezzo: 6.10},
+                    {nome: "Edelweiss Dentifricio con tappo a vite", prezzo: 6.10},
+                    {nome: "Edelweiss Filo interdentale CERATO con olii essenziali", prezzo: 3.20},
+                    {nome: "Edelweiss Filo interdentale NON CERATO con olii essenziali", prezzo: 3.20},
+                    {nome: "Sorriso Stick emolliente-protettivo per labbra", prezzo: 4.50},
+                    {nome: "Sorriso SPF 15", prezzo: 5.40},
+                    {nome: "Sorriso Rosa emolliente protettivo e rimpolpante", prezzo: 4.90}
+                ],
+                "LINEA CORPO": [
+                    {nome: "Crema massaggio cellulitico", prezzo: 17.10},
+                    {nome: "Risveglio, gel seno", prezzo: 15.90},
+                    {nome: "Crema massaggio eutrofico-rassodante", prezzo: 17.10},
+                    {nome: "Crema coadiuvante nel trat. delle smagliature", prezzo: 25.70},
+                    {nome: "Crema levigante per il corpo", prezzo: 17.10},
+                    {nome: "Emulsione dopo bagno emolliente", prezzo: 10.80},
+                    {nome: "Emulsione dopo bagno depurante", prezzo: 10.80},
+                    {nome: "Carezza Emulsione dopo bagno idratante nutriente", prezzo: 10.80},
+                    {nome: "Viridis Emulsion", prezzo: 10.80},
+                    {nome: "Tropical Emulsion", prezzo: 10.80},
+                    {nome: "Rosa Emulsione dopo bagno alla rosa orientale", prezzo: 10.90},
+                    {nome: "Sogno Emulsione corpo agrumata", prezzo: 10.80},
+                    {nome: "Emulsione corpo al miele", prezzo: 10.80},
+                    {nome: "Latte corpo al Riso", prezzo: 12.90},
+                    {nome: "Latte corpo al Cocco", prezzo: 12.90},
+                    {nome: "Latte corpo all'Albicocca NOVITÀ", prezzo: 12.90},
+                    {nome: "Richiamo del bosco per massaggio rilassante", prezzo: 8.70},
+                    {nome: "Cellulitis drying emulsion", prezzo: 10.90},
+                    {nome: "Dolcezza fragranza distensiva analcolica", prezzo: 9.90},
+                    {nome: "Viridis, fragranza rinfrescante analcolica", prezzo: 9.90},
+                    {nome: "Benessere, fragranza rilassante analcolica", prezzo: 9.90},
+                    {nome: "Tropical, Air fragranza tonificante analcolica", prezzo: 9.90},
+                    {nome: "Rosa fragranza analcolica alla rosa orientale", prezzo: 11.50},
+                    {nome: "Sogno Fragranza agrumata analcolica", prezzo: 9.90},
+                    {nome: "Elisir Fragranza agrumata speziata analcolica", prezzo: 10.50},
+                    {nome: "Berg eau de parfum (edizione limitata)", prezzo: 32.50},
+                    {nome: "Dea Bianca extrait de parfum (edizione limitata)", prezzo: 37.00},
+                    {nome: "Essenza Idromassaggio", prezzo: 10.90},
+                    {nome: "Essenza Idromassaggio (grande)", prezzo: 19.10},
+                    {nome: "Olio Neutro", prezzo: 8.70},
+                    {nome: "Balsamic body oil", prezzo: 10.30}
+                ],
+                "LINEA CAPELLI - CUOIO CAPELLUTO": [
+                    {nome: "Shampoo capelli grassi", prezzo: 6.70},
+                    {nome: "Shampoo deforforante", prezzo: 6.80},
+                    {nome: "Shampoo capelli fini e devitalizzati", prezzo: 6.70},
+                    {nome: "Shampoo alla camomilla", prezzo: 6.70},
+                    {nome: "Shampoo depurante", prezzo: 6.90},
+                    {nome: "Shampoo capelli trattati", prezzo: 6.90},
+                    {nome: "Together shampoo doccia", prezzo: 6.90},
+                    {nome: "Shampoo dopo il bagno di sole e di mare", prezzo: 6.90},
+                    {nome: "Shampoo dopo il bagno di sole capelli grassi", prezzo: 6.90},
+                    {nome: "Shampoo solido al miele", prezzo: 7.80},
+                    {nome: "Balsamo capelli grassi", prezzo: 7.30},
+                    {nome: "Balsamo capelli fini e devitalizzati", prezzo: 7.30},
+                    {nome: "Balsamo condizionante-depurante", prezzo: 7.90},
+                    {nome: "Balsamo condizionante capelli trattati", prezzo: 7.70},
+                    {nome: "Balsamo condizionante dopo il bagno di sole e di mare", prezzo: 7.30},
+                    {nome: "Lozione rinforzante capelli grassi", prezzo: 7.20},
+                    {nome: "Lozione riattivante capelli fini", prezzo: 7.20},
+                    {nome: "Plantis deforforante in fiale", prezzo: 15.70},
+                    {nome: "Plantis prevenzione della caduta dei capelli in fiale", prezzo: 15.70},
+                    {nome: "Plantis maschera ristrutturante in tubetto", prezzo: 12.90},
+                    {nome: "Plantis gocce fluido per i capelli", prezzo: 11.90},
+                    {nome: "Friend oil per i capelli", prezzo: 9.70}
+                ],
+                "LINEA IGIENE": [
+                    {nome: "Bagno schiuma quercia marina", prezzo: 6.70},
+                    {nome: "Bagno schiuma dermopurificante", prezzo: 7.00},
+                    {nome: "Bagno schiuma melissa", prezzo: 6.70},
+                    {nome: "Bagno schiuma miele", prezzo: 6.70},
+                    {nome: "Bagno schiuma miele PET", prezzo: 7.80},
+                    {nome: "Bagno schiuma camomilla", prezzo: 6.70},
+                    {nome: "Dolcezza Bagno schiuma distensivo eudermico", prezzo: 6.90},
+                    {nome: "Dolcezza Bagno schiuma PET", prezzo: 7.90},
+                    {nome: "Tropical bath", prezzo: 6.90},
+                    {nome: "Viridis Bath Bagno schiuma rinfrescante protettivo", prezzo: 6.90},
+                    {nome: "Volentieri Bagno schiuma rilassante dermoprotettivo", prezzo: 6.90},
+                    {nome: "Rosa Bagno schiuma rilassante alla rosa orientale", prezzo: 8.00},
+                    {nome: "Sogno Bagno schiuma agrumato PET", prezzo: 7.90},
+                    {nome: "Elisir Bagno schiuma agrumato speziato PET", prezzo: 8.70},
+                    {nome: "Bagnoschiuma solido al Riso", prezzo: 8.90},
+                    {nome: "Nuvola mousse detergente viso e corpo al riso", prezzo: 12.40},
+                    {nome: "Ricetta detergente mani dispenser", prezzo: 6.40},
+                    {nome: "Ricetta detergente mani ricarica", prezzo: 6.20},
+                    {nome: "Amico gel igienizzante per mani con olii essenziali", prezzo: 5.60},
+                    {nome: "Amico gel (grande con dispenser)", prezzo: 12.90},
+                    {nome: "Lavanda purificante dispenser", prezzo: 7.20},
+                    {nome: "Lavanda purificante ricarica", prezzo: 7.00},
+                    {nome: "Salviette detergenti in cotone Lavanda purificante", prezzo: 75.00}
+                ],
+                "LINEA BAMBINI": [
+                    {nome: "Petalo Bagno-Shampoo per bambini dispenser", prezzo: 7.90},
+                    {nome: "Petalo ricarica", prezzo: 7.70},
+                    {nome: "Baby 06 emulsion in tubetto", prezzo: 10.80},
+                    {nome: "Deliziosa acqua profumata analcolica per bambini", prezzo: 9.90},
+                    {nome: "Hygienic oil", prezzo: 8.90},
+                    {nome: "Burro di Karitè", prezzo: 6.40},
+                    {nome: "Burro di Karitè (grande)", prezzo: 13.90}
+                ],
+                "LINEA VARIE": [
+                    {nome: "Essenza Rilassante", prezzo: 11.30},
+                    {nome: "Essenza Rilassante (grande)", prezzo: 20.80},
+                    {nome: "Essenza Depurante", prezzo: 11.80},
+                    {nome: "Essenza Depurante (grande)", prezzo: 21.80},
+                    {nome: "Essenza Stimolante", prezzo: 12.30},
+                    {nome: "Essenza Stimolante (grande)", prezzo: 22.80},
+                    {nome: "Essenza Balsamica", prezzo: 10.50},
+                    {nome: "Essenza Balsamica (grande)", prezzo: 18.70},
+                    {nome: "Essenza Astringente lenitiva", prezzo: 11.30},
+                    {nome: "Essenza Astringente lenitiva (grande)", prezzo: 20.80},
+                    {nome: "Essenza Rafforzante cutanea", prezzo: 11.10},
+                    {nome: "Essenza Rafforzante cutanea (grande)", prezzo: 20.20},
+                    {nome: "Crema bellezza mani tubetto", prezzo: 9.90},
+                    {nome: "Amica crema barriera alle aggressioni alle mani", prezzo: 13.80},
+                    {nome: "Ruin F Lotion", prezzo: 10.50},
+                    {nome: "Crema riacidificante lenitiva", prezzo: 14.80},
+                    {nome: "Crema riacidificante lenitiva (grande)", prezzo: 24.20},
+                    {nome: "Kapnion preparato per pelle desquamante", prezzo: 10.40},
+                    {nome: "New life preparato specifico per pelli sensibilizzate", prezzo: 14.70},
+                    {nome: "New life preparato specifico per pelli sensibilizzate (grande)", prezzo: 23.80},
+                    {nome: "Pedifresh, ricetta per pediluvi", prezzo: 10.10},
+                    {nome: "Crema deodorante pedicalm", prezzo: 12.00},
+                    {nome: "Actiiva Crema per massaggio plantare in tubetto", prezzo: 12.20},
+                    {nome: "Actiiva Crema per massaggio plantare in vaso (grande)", prezzo: 19.60},
+                    {nome: "Beneficial cream all'arnica", prezzo: 11.70},
+                    {nome: "Beneficial cream all'arnica (grande)", prezzo: 18.40},
+                    {nome: "Crema per massaggio gambe", prezzo: 12.90},
+                    {nome: "Crema per massaggio gambe (grande)", prezzo: 21.60},
+                    {nome: "Sollievo spray per gambe rinfrescante e tonificante", prezzo: 8.60},
+                    {nome: "Olio lenitivo", prezzo: 9.70},
+                    {nome: "Eugel, per raffreddamenti, agli olii essenziali", prezzo: 10.80},
+                    {nome: "Emulsione post depilazione", prezzo: 9.80},
+                    {nome: "Rafforzatore unghie e cuticole", prezzo: 6.80},
+                    {nome: "Emulsione solare SPF 10-protezione bassa (UVA)", prezzo: 14.70},
+                    {nome: "Protezione solare SPF 15-protezione media (UVA)", prezzo: 15.50},
+                    {nome: "Crema dopo sole", prezzo: 13.60},
+                    {nome: "Crema dopo sole (grande)", prezzo: 21.90},
+                    {nome: "Holiday oil proteico idratante protettivo", prezzo: 9.80},
+                    {nome: "Summer oil difesa cutanea estiva oleosa", prezzo: 8.50},
+                    {nome: "Quiet summer difesa cutanea estiva acquosa", prezzo: 8.20},
+                    {nome: "Long deodorant emulsion dispenser", prezzo: 8.90},
+                    {nome: "Long deodorant emulsion ricarica", prezzo: 8.70},
+                    {nome: "Long deodorant emulsion FORTE", prezzo: 9.30},
+                    {nome: "Long deodorant emulsion FORTE ricarica", prezzo: 9.10},
+                    {nome: "Heating cream, crema ad effetto riscaldante in tubetto", prezzo: 13.60}
+                ]
+            },
+            "OFFERTE PERMANENTI": {
+                "LAVANDA PURIFICANTE CON RICAMBIO": [
+                    {nome: "Lavanda purificante dispenser Lavanda purificante ricarica", prezzo: 12.20}
+                ],
+                "RICETTA DETERGENTE MANI CON 2 RICAMBI": [
+                    {nome: "Ricetta detergente mani dispenser Ricetta detergente mani ricarica 2 CONFEZIONI", prezzo: 16.10}
+                ],
+                "PETALO CON RICAMBIO": [
+                    {nome: "Petalo Bagno-Shampoo per bambini dispenser Petalo ricarica", prezzo: 13.10}
+                ],
+                "SORRIDI CON GIALEAN": [
+                    {nome: "Edelweiss Collutorio per l'igiene orale Edelweiss Dentifricio Preparato per l'igiene orale Edelweiss Filo interdentale CERATO con olii essenziali Sorriso Stick emolliente-protettivo per labbra + puliscilingua e scatola Sorridi", prezzo: 22.90},
+                    {nome: "Edelweiss Collutorio per l'igiene orale Edelweiss Dentifricio Preparato per l'igiene orale Edelweiss Filo interdentale NON CERATO con olii essenziali Sorriso Stick emolliente-protettivo per labbra + puliscilingua e scatola Sorridi", prezzo: 22.90}
+                ],
+                "IGIENE E CURA DELLA PELLE DEL VISO, PELLI NORMALI": [
+                    {nome: "Latte detergente pelli normali Tonico pelli normali", prezzo: 14.30}
+                ],
+                "IGIENE E CURA DELLA PELLE DEL VISO, PELLI DELICATE, COUPEROSE": [
+                    {nome: "Latte detergente pelli delicate Tonico pelli delicate", prezzo: 14.30}
+                ],
+                "IGIENE E CURA DELLA PELLE DEL VISO, PELLI SECCHE, DISIDRATATE": [
+                    {nome: "Latte detergente pelli secche Tonico pelli secche", prezzo: 14.30}
+                ],
+                "IGIENE E CURA DELLA PELLE DEL VISO, PELLI GRASSE, IMPURE ACNEICHE": [
+                    {nome: "Latte detergente pelli grasse Tonico pelli grasse", prezzo: 14.30}
+                ],
+                "REGALIAMO GIALEAN": [
+                    {nome: "Bagno schiuma quercia marina Emulsione dopo bagno depurante", prezzo: 16.20},
+                    {nome: "Bagno schiuma dermopurificante Emulsione dopo bagno emolliente", prezzo: 16.20},
+                    {nome: "Bagno schiuma melissa Emulsione dopo bagno emolliente", prezzo: 16.20},
+                    {nome: "Bagno schiuma miele Emulsione corpo al miele", prezzo: 16.20},
+                    {nome: "Bagno schiuma camomilla Emulsione dopo bagno emolliente", prezzo: 16.20},
+                    {nome: "Dolcezza Bagno schiuma distensivo eudermico Carezza Emulsione dopo bagno idratante nutriente", prezzo: 16.20},
+                    {nome: "Tropical bath Tropical Emulsion", prezzo: 16.20},
+                    {nome: "Viridis Bath Bagno schiuma rinfrescante protettivo Viridis Emulsion", prezzo: 16.20},
+                    {nome: "Volentieri Bagno schiuma rilassante dermoprotettivo Emulsione dopo bagno emolliente", prezzo: 16.20},
+                    {nome: "Rosa Emulsione dopo bagno alla rosa orientale Rosa Bagno schiuma rilassante alla rosa orientale", prezzo: 17.20},
+                    {nome: "Bagno schiuma tonificante uomo Emulsione dopo bagno per uomo", prezzo: 16.20},
+                    {nome: "Together shampoo doccia Emulsione dopo bagno emolliente", prezzo: 16.20},
+                    {nome: "Petalo Bagno-Shampoo per bambini dispenser Baby 06 emulsion in tubetto", prezzo: 16.20},
+                    {nome: "Bagno schiuma miele PET Emulsione corpo al miele", prezzo: 17.10},
+                    {nome: "Dolcezza Bagno schiuma PET Carezza Emulsione dopo bagno idratante nutriente", prezzo: 17.10},
+                    {nome: "Sogno Bagno schiuma agrumato PET Sogno Emulsione corpo agrumata", prezzo: 17.10},
+                    {nome: "Bagno schiuma tonificante uomo PET Emulsione dopo bagno per uomo", prezzo: 17.10}
+                ],
+                "COFANETTO ESSENZE STIMOLANTE": [
+                    {nome: "Essenza Rilassante (piccola) Essenza Depurante (piccola) Essenza Stimolante (piccola) Essenza Balsamica (piccola) + cofanetto essenze piccolo", prezzo: 39.90},
+                    {nome: "Essenza Rilassante (grande) Essenza Depurante (grande) Essenza Stimolante (grande) Essenza Balsamica (grande) + cofanetto essenze grande", prezzo: 70.90}
+                ],
+                "COFANETTO ESSENZE IDROMASSAGGIO": [
+                    {nome: "Essenza Idromassaggio (piccola) Essenza Rilassante (piccola) Essenza Depurante (piccola) Essenza Balsamica (piccola) + cofanetto essenze piccolo", prezzo: 39.90},
+                    {nome: "Essenza Idromassaggio (grande) Essenza Rilassante (grande) Essenza Depurante (grande) Essenza Balsamica (grande) + cofanetto essenze grande", prezzo: 70.90}
+                ],
+                "IGIENE E CURA DELLA CAPIGLIATURA": [
+                    {nome: "Shampoo capelli grassi Balsamo capelli grassi", prezzo: 12.90},
+                    {nome: "Shampoo deforforante Balsamo condizionante-depurante", prezzo: 12.90},
+                    {nome: "Shampoo capelli fini e devitalizzati Balsamo capelli fini e devitalizzati", prezzo: 12.90},
+                    {nome: "Shampoo alla camomilla Balsamo capelli fini e devitalizzati", prezzo: 12.90},
+                    {nome: "Shampoo depurante Balsamo condizionante-depurante", prezzo: 12.90},
+                    {nome: "Shampoo capelli trattati Balsamo condizionante capelli trattati", prezzo: 12.90},
+                    {nome: "Shampoo dopo il bagno di sole e di mare Balsamo condizionante dopo il bagno di sole e di mare", prezzo: 12.90},
+                    {nome: "Shampoo dopo il bagno di sole capelli grassi Balsamo condizionante dopo il bagno di sole e di mare", prezzo: 12.90}
+                ],
+                "LONG DEODORANT EMULSION CON RICAMBIO": [
+                    {nome: "Long deodorant emulsion dispenser Long deodorant emulsion ricarica", prezzo: 15.70}
+                ],
+                "LONG DEODORANT EMULSION FORTE CON RICAMBIO": [
+                    {nome: "Long deodorant emulsion FORTE Long deodorant emulsion FORTE ricarica", prezzo: 16.30}
+                ],
+                "GIOIELLI GIALEAN": [
+                    {nome: "Olio lenitivo Beneficial cream all'arnica", prezzo: 18.20},
+                    {nome: "Olio lenitivo Beneficial cream all'arnica (grande)", prezzo: 22.50}
+                ],
+                "DENTIFRICIO EDELWEISS 1+1": [
+                    {nome: "Edelweiss Dentifricio Preparato per l'igiene orale 2 CONFEZIONI", prezzo: 10.90}
+                ],
+                "DENTIFRICIO EDELWEISS 1+1 con tappo a vite": [
+                    {nome: "Edelweiss Dentifricio con tappo a vite 2 CONFEZIONI", prezzo: 10.90}
+                ],
+                "IGIENE E CURA DELLA BARBA": [
+                    {nome: "Shampoo per barba Fluido per barba + scatola Barba e nota Barba", prezzo: 16.80}
+                ],
+                "PRONTO SOCCORSO DOMESTICO": [
+                    {nome: "Beneficial cream all'arnica Crema riacidificante lenitiva", prezzo: 23.50},
+                    {nome: "Beneficial cream all'arnica (grande) Crema riacidificante lenitiva (grande)", prezzo: 35.90}
+                ],
+                "CURA DEL CONTORNO OCCHI": [
+                    {nome: "Crema nutriente protettiva contorno occhi Siero per Borse e Occhiaie", prezzo: 18.90}
+                ]
+            },
+                        "OFFERTE STAGIONALI DAL 16/03/2026 AL 26/07/2026": {
+                "SOLE AMICO CON GIALEAN": [
+                    {nome: "Emulsione solare SPF 10-protezione bassa (UVA) Crema dopo sole Holiday oil proteico idratante protettivo", prezzo: 35.70},
+                    {nome: "Protezione solare SPF 15-protezione media (UVA) Crema dopo sole Holiday oil proteico idratante protettivo", prezzo: 35.70},
+                    {nome: "Emulsione solare SPF 10-protezione bassa (UVA) Crema dopo sole (grande) Holiday oil proteico idratante protettivo Sorriso SPF 15", prezzo: 43.40},
+                    {nome: "Protezione solare SPF 15-protezione media (UVA) Crema dopo sole (grande) Holiday oil proteico idratante protettivo Sorriso SPF 15", prezzo: 43.40}
+                ],
+                "SOLE AMICO CON GIALEAN SPECIALE": [
+                    {nome: "Emulsione solare SPF 10-protezione bassa (UVA) Protezione solare SPF 15-protezione media (UVA) Crema dopo sole", prezzo: 39.90},
+                    {nome: "Emulsione solare SPF 10-protezione bassa (UVA) Protezione solare SPF 15-protezione media (UVA) Crema dopo sole (grande) Sorriso SPF 15", prezzo: 48.40}
+                ]
+            },
+            "OFFERTE STAGIONALI DAL 11/05/2026 AL 26/07/2026": {
+                "PIEDE FELICE CON GIALEAN": [
+                    {nome: "Pedifresh, ricetta per pediluvi Crema deodorante pedicalm", prezzo: 19.90},
+                    {nome: "Pedifresh, ricetta per pediluvi Actiiva Crema per massaggio plantare in tubetto", prezzo: 19.90},
+                    {nome: "Pedifresh, ricetta per pediluvi Actiiva Crema per massaggio plantare in vaso (grande)", prezzo: 25.20}
+                ],
+                "PELLE MORBIDA E PROFUMATA CON GIALEAN": [
+                    {nome: "Crema levigante per il corpo Dolcezza fragranza distensiva analcolica", prezzo: 23.90},
+                    {nome: "Crema levigante per il corpo Viridis, fragranza rinfrescante analcolica", prezzo: 23.90},
+                    {nome: "Crema levigante per il corpo Benessere, fragranza rilassante analcolica", prezzo: 23.90},
+                    {nome: "Crema levigante per il corpo Tropical, Air fragranza tonificante analcolica", prezzo: 23.90},
+                    {nome: "Crema levigante per il corpo Rosa fragranza analcolica alla rosa orientale", prezzo: 23.90},
+                    {nome: "Crema levigante per il corpo Deliziosa acqua profumata analcolica per bambini", prezzo: 23.90},
+                    {nome: "Crema levigante per il corpo Frizione dopo bagno per uomo", prezzo: 23.90},
+                    {nome: "Crema levigante per il corpo Sogno Fragranza agrumata analcolica", prezzo: 23.90},
+                    {nome: "Crema levigante per il corpo Elisir Fragranza agrumata speziata analcolica", prezzo: 23.90}
+                ],
+                "ESTATE TRANQUILLA CON GIALEAN": [
+                    {nome: "Beneficial cream all'arnica Quiet summer difesa cutanea estiva acquosa", prezzo: 17.90},
+                    {nome: "Beneficial cream all'arnica Summer oil difesa cutanea estiva oleosa", prezzo: 17.90},
+                    {nome: "Beneficial cream all'arnica (grande) Quiet summer difesa cutanea estiva acquosa", prezzo: 22.90},
+                    {nome: "Beneficial cream all'arnica (grande) Summer oil difesa cutanea estiva oleosa", prezzo: 22.90}
+                ],
+                "IDRATA E NUTRI LA PELLE CON GIALEAN": [
+                    {nome: "Collagenina d'urto Delicute Concentrato antiageing", prezzo: 29.90}
+                ],
+                "IDRATA E RASSODA LA PELLE CON GIALEAN": [
+                    {nome: "Gel rassodante viso effetto lifting Dermolife", prezzo: 28.90}
+                ],
+                "SOLLIEVO PER LE GAMBE": [
+                    {nome: "Sollievo spray per gambe rinfrescante e tonificante Crema per massaggio gambe", prezzo: 18.90},
+                    {nome: "Sollievo spray per gambe rinfrescante e tonificante Crema per massaggio gambe (grande)", prezzo: 25.90}
+                ]
+            }
+        };
+
+        // Elementi DOM
+        const categoriaSelect = document.getElementById('categoria');
+        const lineaSelect = document.getElementById('linea');
+        const prodottoSelect = document.getElementById('prodotto');
+        const prezzoInput = document.getElementById('prezzo');
+        const quantitaInput = document.getElementById('quantita');
+        const aggiungiBtn = document.getElementById('aggiungi-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const itemsContainer = document.getElementById('items-container');
+        const totaleSpan = document.getElementById('totale');
+        const receiptDiv = document.getElementById('receipt');
+        const receiptClienteSpan = document.getElementById('receipt-cliente');
+        const receiptDataSpan = document.getElementById('receipt-data');
+        const receiptItemsTable = document.getElementById('receipt-items');
+        const receiptTotaleSpan = document.getElementById('receipt-totale');
+        const dataAttualeInput = document.getElementById('data-attuale');
+        
+        // Funzione per aggiornare la data in tempo reale
+        function aggiornaData() {
+            const adesso = new Date();
+            const opzioni = { 
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit',
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            dataAttualeInput.value = adesso.toLocaleDateString('it-IT', opzioni);
+        }
+        
+        // Aggiorna la data ogni secondo
+        aggiornaData();
+        setInterval(aggiornaData, 1000);
+        
+        // Formatta numero con virgola come separatore decimale
+        function fmt(n) { return n.toFixed(2).replace('.', ','); }
+
+        // Verifica se ci sono dati salvati in localStorage
+        let carrello = [];
+        let totale = 0;
+        
+        // Funzione per salvare lo stato
+        function salvaStato() {
+            const stato = {
+                carrello: carrello,
+                totale: totale
+            };
+            try {
+                localStorage.setItem('carrelloStato', JSON.stringify(stato));
+            } catch (e) {
+                console.log('Impossibile salvare in localStorage:', e);
+            }
+        }
+        
+        // Funzione per ripristinare lo stato
+        function ripristinaStato() {
+            try {
+                const statoSalvato = localStorage.getItem('carrelloStato');
+                if (statoSalvato) {
+                    const stato = JSON.parse(statoSalvato);
+                    carrello = stato.carrello || [];
+                    totale = stato.totale || 0;
+                    aggiornaCarrello();
+                }
+            } catch (e) {
+                console.log('Impossibile ripristinare da localStorage:', e);
+            }
+        }
+
+        // Livello 1: cambio categoria principale
+        categoriaSelect.addEventListener('change', function() {
+            const cat = this.value;
+            prezzoInput.value = '';
+            prodottoSelect.disabled = true;
+            prodottoSelect.innerHTML = '<option value="">Seleziona prima una linea</option>';
+            lineaSelect.disabled = true;
+            lineaSelect.innerHTML = '<option value="">Seleziona prima una categoria</option>';
+
+            if (cat && catalogo[cat]) {
+                document.getElementById('gruppo-linea').style.display = '';
+                lineaSelect.disabled = false;
+                lineaSelect.innerHTML = '<option value="">Seleziona una linea / offerta</option>';
+                Object.keys(catalogo[cat]).forEach(linea => {
+                    const opt = document.createElement('option');
+                    opt.value = linea;
+                    opt.textContent = linea;
+                    lineaSelect.appendChild(opt);
+                });
+            } else {
+                document.getElementById('gruppo-linea').style.display = 'none';
+            }
+        });
+
+        // Livello 2: cambio linea/sottocategoria
+        lineaSelect.addEventListener('change', function() {
+            const cat = categoriaSelect.value;
+            const linea = this.value;
+            prezzoInput.value = '';
+
+            if (cat && linea && catalogo[cat] && catalogo[cat][linea]) {
+                prodottoSelect.disabled = false;
+                prodottoSelect.innerHTML = '<option value="">Seleziona un prodotto</option>';
+                catalogo[cat][linea].forEach(prodotto => {
+                    const option = document.createElement('option');
+                    option.value = prodotto.nome;
+                    option.textContent = prodotto.nome;
+                    prodottoSelect.appendChild(option);
+                });
+            } else {
+                prodottoSelect.disabled = true;
+                prodottoSelect.innerHTML = '<option value="">Seleziona prima una linea</option>';
+            }
+        });
+
+        // Livello 3: cambio prodotto → mostra prezzo
+        prodottoSelect.addEventListener('change', function() {
+            const cat = categoriaSelect.value;
+            const linea = lineaSelect.value;
+            const prodottoSelezionato = this.value;
+            
+            if (cat && linea && prodottoSelezionato) {
+                const prodotto = catalogo[cat][linea].find(p => p.nome === prodottoSelezionato);
+                prezzoInput.value = prodotto ? fmt(prodotto.prezzo) : '';
+            } else {
+                prezzoInput.value = '';
+            }
+        });
+
+        // Aggiungi prodotto al carrello
+        aggiungiBtn.addEventListener('click', function() {
+            const categoriaSelezionata = categoriaSelect.value;
+            const lineaSelezionata = lineaSelect.value;
+            const prodottoSelezionato = prodottoSelect.value;
+            const prezzo = parseFloat(prezzoInput.value.replace(',', '.'));
+            const quantita = parseInt(quantitaInput.value);
+            const cliente = document.getElementById('cliente').value;
+            
+            if (!cliente) {
+                alert('Inserisci il nome del cliente');
+                return;
+            }
+            
+            if (!categoriaSelezionata || !lineaSelezionata || !prodottoSelezionato || isNaN(prezzo) || isNaN(quantita) || quantita <= 0) {
+                alert('Seleziona categoria, linea, prodotto e una quantità valida');
+                return;
+            }
+            
+            const subtotale = prezzo * quantita;
+            const prodottoEsistente = carrello.findIndex(item => 
+                item.categoria === categoriaSelezionata && item.linea === lineaSelezionata && item.prodotto === prodottoSelezionato
+            );
+            
+            if (prodottoEsistente >= 0) {
+                totale -= carrello[prodottoEsistente].subtotale;
+                carrello[prodottoEsistente].quantita += quantita;
+                carrello[prodottoEsistente].subtotale = carrello[prodottoEsistente].prezzo * carrello[prodottoEsistente].quantita;
+                totale += carrello[prodottoEsistente].subtotale;
+            } else {
+                carrello.push({
+                    categoria: categoriaSelezionata,
+                    linea: lineaSelezionata,
+                    prodotto: prodottoSelezionato,
+                    prezzo: prezzo,
+                    quantita: quantita,
+                    subtotale: subtotale
+                });
+                totale += subtotale;
+            }
+            
+            // Aggiorna il carrello
+            aggiornaCarrello();
+            
+            // Resetta i campi
+            prodottoSelect.selectedIndex = 0;
+            prezzoInput.value = '';
+            quantitaInput.value = 1;
+            
+            // Salva lo stato
+            salvaStato();
+            
+            // Feedback visivo di successo
+            aggiungiBtn.textContent = "Prodotto Aggiunto!";
+            aggiungiBtn.style.backgroundColor = "#28a745";
+            setTimeout(() => {
+                aggiungiBtn.textContent = "Aggiungi al Carrello";
+                aggiungiBtn.style.backgroundColor = "#ff9900";
+            }, 1000);
+        });
+
+        // Aggiorna visualizzazione del carrello
+        function aggiornaCarrello() {
+            itemsContainer.innerHTML = '';
+            
+            if (carrello.length === 0) {
+                itemsContainer.innerHTML = '<p>Il tuo carrello è vuoto</p>';
+                totaleSpan.textContent = '€0.00';
+                receiptDiv.classList.add('hide');
+                return;
+            }
+            
+            carrello.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'cart-item';
+                itemDiv.innerHTML = `
+                    <div class="cart-item-details">
+                        <strong>${item.prodotto}</strong><br>
+                        <small>${item.categoria} › ${item.linea}</small><br>
+                        €${fmt(item.prezzo)} x ${item.quantita} = €${fmt(item.subtotale)}
+                    </div>
+                    <button class="remove-btn" data-index="${index}">Rimuovi</button>
+                `;
+                itemsContainer.appendChild(itemDiv);
+            });
+            
+            // Aggiorna totale
+            totaleSpan.textContent = `€${fmt(totale)}`;
+            
+            // Aggiorna Ordine
+            aggiornaOrdine();
+            
+            // Aggiungi event listener ai pulsanti di rimozione
+            document.querySelectorAll('.remove-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    rimuoviProdotto(index);
+                });
+            });
+        }
+
+        // Rimuovi prodotto dal carrello
+        function rimuoviProdotto(index) {
+            if (index >= 0 && index < carrello.length) {
+                totale -= carrello[index].subtotale;
+                carrello.splice(index, 1);
+                aggiornaCarrello();
+                salvaStato();
+            }
+        }
+
+        // Resetta il carrello
+        resetBtn.addEventListener('click', function() {
+            if (carrello.length > 0) {
+                if (confirm('Sei sicuro di voler svuotare il carrello?')) {
+                    carrello = [];
+                    totale = 0;
+                    aggiornaCarrello();
+                    salvaStato();
+                }
+            } else {
+                alert('Il carrello è già vuoto');
+            }
+        });
+
+        // Aggiorna Ordine
+        function aggiornaOrdine() {
+            const cliente = document.getElementById('cliente').value;
+            
+            if (carrello.length === 0 || !cliente) {
+                receiptDiv.classList.add('hide');
+                return;
+            }
+            
+            // Mostra la Ordine
+            receiptDiv.classList.remove('hide');
+            
+            // Aggiorna dati cliente e data
+            receiptClienteSpan.textContent = cliente;
+            const oggi = new Date();
+            receiptDataSpan.textContent = oggi.toLocaleDateString('it-IT');
+            
+            // Aggiorna items
+            receiptItemsTable.innerHTML = '';
+            carrello.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${item.prodotto}<br><small style="color:#888">${item.categoria} › ${item.linea}</small></td>
+                    <td>€${fmt(item.prezzo)}</td>
+                    <td>${item.quantita}</td>
+                    <td>€${fmt(item.subtotale)}</td>
+                `;
+                receiptItemsTable.appendChild(tr);
+            });
+            
+            // Aggiorna totale
+            receiptTotaleSpan.textContent = `€${fmt(totale)}`;
+        }
+
+
+        
+        // Event listener per il pulsante indietro del browser
+        window.addEventListener('beforeunload', function(e) {
+            salvaStato();
+        });
+
+
+        // Scarica ZIP con PDF + JSON
+        document.getElementById('zip-btn').addEventListener('click', async function() {
+            const cliente = document.getElementById('cliente').value.trim();
+            if (!cliente || carrello.length === 0) {
+                alert('Aggiungi almeno un prodotto e il nome cliente prima di scaricare');
+                return;
+            }
+
+            const oggi = new Date();
+            const dataStr = oggi.toLocaleDateString('it-IT');
+            const oraStr = oggi.toLocaleTimeString('it-IT', {hour: '2-digit', minute: '2-digit'});
+            const nomeBase = 'Ordine_' + cliente.replace(/\s+/g,'_') + '_' + dataStr.replace(/\//g,'');
+
+            // ── JSON ──
+            const ordine = {
+                cliente: cliente,
+                data: dataStr,
+                ora: oraStr,
+                timestamp: oggi.toISOString(),
+                totale: parseFloat(totale.toFixed(2)),
+                items: carrello.map(item => ({
+                    prodotto: item.prodotto,
+                    categoria: item.categoria,
+                    linea: item.linea,
+                    prezzo: item.prezzo,
+                    qty: item.quantita,
+                    totale: parseFloat(item.subtotale.toFixed(2))
+                }))
+            };
+            const jsonStr = JSON.stringify(ordine, null, 2);
+
+            // ── PDF con jsPDF ──
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+            const margin = 20;
+            const pageW = 210;
+            const colW = pageW - margin * 2;
+            let y = 20;
+
+            // Titolo
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(20);
+            doc.text('Carrello Acquisti', pageW / 2, y, { align: 'center' });
+            y += 12;
+
+            // Sezione Ordine
+            doc.setFontSize(14);
+            doc.text('Ordine', margin, y);
+            y += 2;
+            doc.setDrawColor(200, 200, 200);
+            doc.line(margin, y, pageW - margin, y);
+            y += 8;
+
+            // Cliente e Data
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Cliente:', margin, y);
+            doc.setFont('helvetica', 'normal');
+            doc.text(cliente, margin + 22, y);
+            y += 8;
+            doc.setFont('helvetica', 'bold');
+            doc.text('Data:', margin, y);
+            doc.setFont('helvetica', 'normal');
+            doc.text(dataStr, margin + 22, y);
+            y += 10;
+
+            // Intestazione tabella
+            doc.setFillColor(245, 245, 245);
+            doc.rect(margin, y - 5, colW, 8, 'F');
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10);
+            doc.text('Prodotto', margin + 2, y);
+            doc.text('Prezzo', margin + 108, y, { align: 'right' });
+            doc.text('Qtà', margin + 128, y, { align: 'right' });
+            doc.text('Totale', margin + colW - 2, y, { align: 'right' });
+            y += 6;
+            doc.line(margin, y, pageW - margin, y);
+            y += 6;
+
+            // Righe prodotti
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            carrello.forEach(item => {
+                // Wrappa testo prodotto lungo
+                const nomeLines = doc.splitTextToSize(item.prodotto, 100);
+                doc.text(nomeLines, margin + 2, y);
+                doc.text('€' + fmt(item.prezzo), margin + 108, y, { align: 'right' });
+                doc.text(String(item.quantita), margin + 128, y, { align: 'right' });
+                doc.text('€' + fmt(item.subtotale), margin + colW - 2, y, { align: 'right' });
+                y += nomeLines.length > 1 ? nomeLines.length * 5 : 5;
+                // Categoria e linea in piccolo
+                doc.setFontSize(8);
+                doc.setTextColor(140, 140, 140);
+                const catLine = doc.splitTextToSize(item.categoria + ' › ' + item.linea, 100);
+                doc.text(catLine, margin + 2, y);
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                y += catLine.length * 4 + 3;
+                doc.setDrawColor(230, 230, 230);
+                doc.line(margin, y - 2, pageW - margin, y - 2);
+            });
+
+            // Totale
+            y += 4;
+            doc.line(margin, y, pageW - margin, y);
+            y += 8;
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(12);
+            doc.text('Totale:', margin, y);
+            doc.text('€' + fmt(totale), margin + colW - 2, y, { align: 'right' });
+
+            const pdfBytes = doc.output('arraybuffer');
+
+            // ── ZIP ──
+            const zip = new JSZip();
+            zip.file(nomeBase + '.json', jsonStr);
+            zip.file(nomeBase + '.pdf', pdfBytes);
+
+            const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
+            const url = URL.createObjectURL(zipBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = nomeBase + '.zip';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // Inizializza
+        ripristinaStato();
+        aggiornaCarrello();
+        
+        // Fix per input number su iOS
+        document.addEventListener('touchstart', function() {}, false);
+        
+        // Prevent zoom on iOS when focusing on inputs
+        const allInputs = document.querySelectorAll('input, select');
+        allInputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                document.body.style.fontSize = '16px';
+            });
+        });
+    </script>
+</body>
+</html>
